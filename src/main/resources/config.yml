@@ -1,0 +1,13 @@
+# Nach Änderungen den Server vollständig neu starten.
+death-counter:
+  enabled: true
+
+rules:
+  - 'Geht respektvoll miteinander um. Keine Beleidigungen, Diskriminierung oder Belästigung.'
+  - 'Kein Griefing: Verändert oder zerstört fremde Bauwerke und Grundstücke nur mit Erlaubnis.'
+  - 'Kein Diebstahl: Fremde Kisten, Gegenstände, Tiere und Farmen sind ohne Erlaubnis tabu. Ausnahmen sind ausdrücklich freigegebene Gemeinschaftsbereiche.'
+  - 'PvP und Fallen nur mit Zustimmung aller Beteiligten. Streiche dürfen keinen dauerhaften Schaden oder Itemverlust verursachen.'
+  - 'Keine Cheats, X-Ray oder Duplizierungs-Exploits. Meldet ausnutzbare Fehler einem Operator.'
+  - 'Haltet Spawn und Gemeinschaftsbereiche ordentlich. Pflanzt gemeinsam genutzte Felder nach und repariert selbst verursachte Schäden.'
+  - 'Verursacht keine absichtlichen Lags. Sprecht besonders große Farmen und Redstone-Anlagen vorher mit einem Operator ab.'
+  - 'Meldet verschwundene persönliche Elytren einem Operator. Nutzt die Ersatzvergabe nicht, um zusätzliche Elytren zu sammeln.'

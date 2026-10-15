@@ -1,0 +1,10 @@
+name: BHD-CraftAttack
+version: '${version}'
+main: io.github.leonstange.bhdcraftattack.BhdCraftAttackPlugin
+api-version: '26.3'
+prefix: 'BHD - Craft Attack'
+description: Persönliche Elytra, Serverregeln, Teamnamen und Todeszähler.
+commands:
+  bhd-craftattack:
+    description: Serverregeln und Verwaltung von BHD-CraftAttack.
+    usage: /bhd-craftattack <elytra <Spielername>|death reset <Spielername>|team <Teamname>|team <Spielername> <Teamname|reset>|version|regeln>

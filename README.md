@@ -34,6 +34,8 @@ sein Inventar.
   angezeigt, beispielsweise `Persönliche Elytra von Leon`.
 - Die Vergabe wird pro Spieler dauerhaft gespeichert. Erneutes Beitreten oder
   ein Serverneustart führt nicht zur Vergabe einer weiteren Elytra.
+- Bei vollem Inventar wird die Erstvergabe verschoben. Sobald ein Platz frei ist,
+  erhält der Spieler seine Elytra; sie wird nicht auf den Boden geworfen.
 
 ## Schutz vor Verarbeitung
 
@@ -44,6 +46,8 @@ Name, Beschreibung und Schutz-Eigenschaften bleiben erhalten.
 
 Gewöhnliche Elytren und andere Gegenstände sind von diesem Verarbeitungsschutz
 nicht betroffen.
+Auch das Verbrauchen in Reparatur-Rezepten am Craftingfeld, an der Werkbank oder
+im automatischen Crafter wird verhindert.
 
 ## Ablegen und Drop-Schutz
 
@@ -77,10 +81,9 @@ Tod bei sich trägt:
 
 Das automatische Ausrüsten gilt nur für die beim Tod tatsächlich mitgeführte
 eigene Elytra. Eine in einer Kiste gelagerte Elytra wird nicht zurückgeholt.
-Ist der Brustslot beim Respawn bereits belegt, darf der vorhandene Gegenstand
-nicht überschrieben oder gelöscht werden; er wird sicher ins Inventar verschoben.
-Falls dort kein Platz vorhanden ist, bleibt die Elytra erhalten und wird erst
-ausgerüstet, sobald sie ohne Gegenstandsverlust angelegt werden kann.
+Ist der Brustslot beim Respawn bereits belegt, wird der vorhandene Gegenstand
+in den bisherigen Inventarslot der Elytra getauscht. Dadurch geht auch bei
+vollem Inventar kein Gegenstand verloren.
 
 Der Todesschutz darf die Elytra weder duplizieren noch zusätzlich als Gegenstand
 am Todesort hinterlassen. Er betrifft die eigene, vom Plugin vergebene Elytra;
@@ -97,12 +100,54 @@ als Erkennungsmerkmal.
 | `/bhd-craftattack elytra <Spielername>` | Dem angegebenen Spieler eine neue persönliche Elytra als Ersatz direkt ins Inventar geben. | Nur Operatoren |
 | `/bhd-craftattack version` | Die aktuell geladene Plugin-Version anzeigen; die erste Version ist `v0.0.1`. | Nur Operatoren |
 | `/bhd-craftattack regeln` | Die Serverregeln im eigenen Chat anzeigen. | Alle Spieler |
+| `/bhd-craftattack death reset <Spielername>` | Den Todeszähler des angegebenen Spielers auf `0` zurücksetzen. | Nur Operatoren |
+| `/bhd-craftattack team <Teamname>` | Den eigenen Teamnamen setzen oder ändern. | Alle Spieler |
+| `/bhd-craftattack team <Spielername> <Teamname>` | Den Teamnamen eines anderen Spielers setzen oder ändern. | Nur Operatoren |
+| `/bhd-craftattack team <Spielername> reset` | Den Teamnamen des angegebenen Spielers löschen. | Nur Operatoren |
+
+Alle Befehle verwenden einheitlich den Hauptbefehl `/bhd-craftattack`.
+
+## Teamnamen in Chat und Tab-Liste
+
+Jeder Spieler kann seinen eigenen Teamnamen frei wählen. Ein Teamname ist ein
+sichtbarer Zusatz zum Spielernamen und verleiht keine zusätzlichen Rechte.
+
+```text
+/bhd-craftattack team Baumeister
+```
+
+Damit erscheint der Spieler beispielsweise als `[Baumeister] Leon` in der
+Tab-Liste und mit demselben Präfix im Chat. Die eigentliche Chatnachricht bleibt
+erhalten; vorhandene Chatformatierung wird weiterverwendet.
+
+Eigene Teamnamen mit Leerzeichen werden in Anführungszeichen angegeben:
+
+```text
+/bhd-craftattack team "Die Baumeister"
+```
+
+Teamnamen werden als normaler Text angezeigt. Sonderzeichen und Umlaute sind
+möglich; Farb- oder Formatierungscodes werden nicht interpretiert. Leere Namen
+und Steuerzeichen wie Zeilenumbrüche werden abgelehnt.
+
+Operatoren können den Teamnamen eines online verbundenen Spielers verwalten:
+
+```text
+/bhd-craftattack team Leon Baumeister
+/bhd-craftattack team Leon Die Baumeister
+/bhd-craftattack team Leon reset
+```
+
+Der letzte Befehl entfernt den Teamnamen und damit den Präfix in Chat und
+Tab-Liste. Andere Spieler dürfen fremde Teamnamen weder setzen noch zurücksetzen.
+Teamnamen werden dauerhaft in den Spielerdaten gespeichert und nach Rejoin,
+Respawn oder Serverneustart wieder angezeigt.
 
 ## Serverregeln im Chat
 
 Mit `/bhd-craftattack regeln` kann jeder Spieler die Regeln jederzeit abrufen.
-Die Ausgabe wird nur dem ausführenden Spieler angezeigt. Die Regeltexte sollen
-über die `config.yml` anpassbar sein.
+Die Ausgabe wird nur dem ausführenden Spieler angezeigt. Die Regeltexte sind
+über die `config.yml` anpassbar.
 
 Folgender konkreter Regelvorschlag soll als Ausgangspunkt für die Chat-Ausgabe
 dienen:
@@ -146,15 +191,87 @@ gegangen oder verschwunden ist.
   ausgerüstet, erhält der Operator einen Hinweis auf die mögliche doppelte
   Vergabe. Die Prüfung bezieht sich auf die eigene Plugin-Elytra des Empfängers;
   gewöhnliche Elytren zählen dabei nicht. Kisten werden nicht durchsucht.
+  Die Warnung verhindert die ausdrücklich angeforderte Ersatzvergabe nicht.
 - Die manuelle Ersatzvergabe löst bei späteren Joins keine erneute automatische
   Vergabe aus und entfernt keine bereits in Kisten liegenden Elytren.
 
-## Optionaler Todeszähler
+## Todeszähler
 
-Die Anzahl der Tode pro Spieler kann optional in der Tab-Liste angezeigt werden.
-Diese Anzeige soll über die Plugin-Konfiguration ein- und ausschaltbar sein.
+Die Anzahl der Tode pro Spieler wird in der Tab-Liste angezeigt.
+Die Anzeige lässt sich über `death-counter.enabled` in der Plugin-Konfiguration
+ein- und ausschalten; in einer neu erzeugten Konfiguration ist sie eingeschaltet.
+Eine vorhandene Einstellung `enabled: false` wird nicht überschrieben. In diesem
+Fall `death-counter.enabled` auf `true` setzen und den Server neu starten.
 Die Zählerstände bleiben über Spieler-Rejoins und Serverneustarts hinweg erhalten.
 Der Elytra-Todesschutz beeinflusst die Zählung nicht: Ein Tod wird auch dann
 gezählt, wenn die persönliche Elytra erhalten bleibt.
 
-Weitere Funktionen, Befehle und Berechtigungen werden noch ergänzt.
+Verwendet wird die dauerhaft gespeicherte Minecraft-Statistik `DEATHS`,
+einschließlich bereits vor der Plugin-Installation gezählter Tode. Die Anzeige
+wird einmal pro Sekunde aktualisiert.
+
+Mit `/bhd-craftattack death reset <Spielername>` kann ein Operator den Zähler
+eines einzelnen Spielers auf `0` zurücksetzen. Andere Spieler bleiben unverändert.
+Der Befehl funktioniert für online verbundene und dem Server bereits bekannte
+Offline-Spieler. Unbekannte Spieler werden mit einer Fehlermeldung abgelehnt.
+Die Änderung wird dauerhaft gespeichert und betrifft die Minecraft-Statistik
+`DEATHS` selbst. Auch nach einem Neustart gilt damit der zurückgesetzte Wert;
+zukünftige Tode werden wieder ab `0` weitergezählt.
+
+## Speicherung und Konfiguration
+
+Die `config.yml` wird beim ersten Start unter `plugins/BHD-CraftAttack/` erstellt.
+Nach Änderungen an den Regeln oder am Todeszähler den Server vollständig neu
+starten.
+
+Erstvergabe, Teamname und die Markierung zum Anziehen nach dem Tod liegen in den
+persistenten Spielerdaten von Minecraft. Die Besitzer-UUID liegt direkt auf der
+Elytra. Dafür sind keine Datenbank und keine zusätzliche Spielerdatei des Plugins
+nötig. Bei Sicherungen auch die Spieler- und Weltdaten des Servers sichern.
+
+## Bauen und installieren
+
+Voraussetzung ist ein **JDK 25**. Der Gradle-Wrapper lädt die benötigten
+Build-Abhängigkeiten beim ersten Aufruf herunter.
+
+```bash
+./gradlew build
+```
+
+Unter Windows: `gradlew.bat build`.
+
+Die fertige Datei liegt unter `build/libs/BHD-CraftAttack-0.0.1.jar`. Diese JAR
+in den `plugins`-Ordner des Paper-26.3-Servers kopieren und den Server vollständig
+neu starten. Zusätzliche Plugins, Laufzeitbibliotheken oder Client-Mods sind
+nicht erforderlich.
+
+## Tests
+
+`./gradlew build` prüft auch Plugin-Registrierung, Version und Standardkonfiguration.
+Die Verhaltensprüfungen laufen separat auf einem lokalen Paper-26.3-Testserver:
+
+```bash
+./gradlew integrationTest
+```
+
+Dabei werden Paper Stable Build 190 und dessen Abhängigkeiten heruntergeladen.
+Für diesen isolierten Testserver wird die Minecraft-EULA angenommen. Er lauscht
+nur auf `127.0.0.1` mit einem automatisch vergebenen Port und beendet sich nach
+den Tests selbst. Sämtliche Testdaten liegen unter `build/integration/`, die
+letzte Ausgabe in `build/integration/latest.log`.
+
+Die Tests verwenden simulierte Spieler und Inventaransichten mit der tatsächlichen
+Paper-Item-, Metadaten-, Event- und Scoreboard-API. Geprüft werden unter anderem
+Erstvergabe, persistente Kennzeichnungen, Inventar/Brustslot/Nebenhand beim Tod,
+Respawn, volle Inventare, doppelte Ersatz-Elytren, Drop- und Verarbeitungsschutz,
+Berechtigungen, konfigurierbare Regeln und die Tab-Anzeige. Zusätzliche Prüfungen
+decken den Todeszähler-Reset einschließlich echter Offline-Statistikdateien,
+Team-Befehle, fremde Team-Verwaltung, persistente Teamnamen und die
+Chat-Darstellung ab. Der Test-Plugin-Code
+wird nicht in die auszuliefernde JAR gepackt. Eine visuelle Prüfung mit einem
+Minecraft-Client bleibt ein eigener Spieltest.
+
+Grundlagen: [Paper-Projektaufbau](https://docs.papermc.io/paper/dev/project-setup/),
+[persistente Daten](https://docs.papermc.io/paper/dev/pdc/) und
+[einzelne Gegenstände beim Tod behalten](https://jd.papermc.io/paper/26.3/org/bukkit/event/entity/PlayerDeathEvent.html#getItemsToKeep()).
+Die Chat-Anpassung verwendet [Papers Chat-Renderer](https://docs.papermc.io/paper/dev/chat-events/).

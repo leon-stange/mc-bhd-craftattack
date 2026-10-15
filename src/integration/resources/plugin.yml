@@ -1,0 +1,5 @@
+name: CraftAttackVerification
+version: '1'
+main: io.github.leonstange.bhdcraftattack.verification.VerificationPlugin
+api-version: '26.3'
+depend: [BHD-CraftAttack]
